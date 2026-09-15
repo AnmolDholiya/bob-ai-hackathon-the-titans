@@ -1,105 +1,568 @@
-# Setup Guide
+# PortMind — Setup Guide
 
-> **This file is read by the automated evaluation pipeline. Be precise and complete.**
+> AI-powered vessel congestion prediction and port operations optimization platform for the IBM Bob Hackathon.
 
-## Prerequisites
+## 1. Project Structure
 
-Before you begin, ensure you have the following installed:
-
-- [ ] Python 3.11+
-- [ ] Node.js 18+
-- [ ] npm 9+
-
-## Repository Structure
-
+```text
+bob-ai-hackathon-the-titans/
+├── .github/
+├── demo/
+├── docs/
+├── presentation/
+├── src/
+│   ├── backend/
+│   │   ├── app/
+│   │   │   ├── api/
+│   │   │   ├── models/
+│   │   │   ├── schemas/
+│   │   │   └── services/
+│   │   ├── l1_congestion_production/
+│   │   │   ├── xgboost_pipeline.joblib
+│   │   │   ├── lightgbm_pipeline.joblib
+│   │   │   └── metadata.joblib
+│   │   ├── port_congestion.db
+│   │   ├── tracking_db.csv
+│   │   ├── seed_port_infrastructure.py
+│   │   ├── test_production_integration.py
+│   │   └── requirements.txt
+│   │
+│   ├── frontend/
+│   │   ├── public/
+│   │   │   ├── assets/
+│   │   │   ├── portmind_demo_vessels.csv
+│   │   │   └── sample-vessels.csv
+│   │   └── src/
+│   │       ├── components/
+│   │       ├── context/
+│   │       ├── i18n/
+│   │       ├── layouts/
+│   │       ├── pages/
+│   │       ├── services/
+│   │       ├── App.jsx
+│   │       └── index.css
+│   └── package-lock.json
+├── CONTRIBUTING.md
+├── README.md
+├── setup-guide.md
+└── submission.yaml
 ```
-src/
-├── frontend/     ← React + Vite UI
-├── backend/      ← FastAPI server
-└── ml/           ← ML layer (placeholder — future phase)
-```
 
-## Environment Variables
+## 2. Prerequisites
 
-### Backend
+Install:
+
+- Python 3.10 or newer
+- Node.js 18 or newer
+- npm
+- Git
+
+### macOS — XGBoost dependency
+
+If XGBoost reports a missing `libomp.dylib`, install OpenMP:
 
 ```bash
-cd src/backend
-cp .env.example .env
+brew install libomp
 ```
 
-| Variable | Description | Required |
-|---|---|---|
-| `APP_ENV` | Application environment (`development` / `production`) | No |
-| `APP_PORT` | Port the backend listens on (default `8000`) | No |
-| `DATABASE_URL` | SQLite connection URL | No |
-| `CORS_ORIGINS` | Comma-separated list of allowed frontend origins | No |
-
-### Frontend
+## 3. Clone the Repository
 
 ```bash
-cd src/frontend
-cp .env.example .env
-```
-
-| Variable | Description | Required |
-|---|---|---|
-| `VITE_API_BASE_URL` | Backend base URL (default `http://localhost:8000`) | No |
-
-## Installation
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/<your-org>/bob-ai-hackathon-the-titans.git
+git clone https://github.com/AnmolDholiya/bob-ai-hackathon-the-titans.git
 cd bob-ai-hackathon-the-titans
+```
 
-# 2. Install backend dependencies
+If the repository is already cloned:
+
+```bash
+cd bob-ai-hackathon-the-titans
+```
+
+## 4. Backend Setup
+
+From the repository root:
+
+```bash
 cd src/backend
-python -m venv .venv
-# Windows
-.venv\Scripts\activate
-# macOS / Linux
+```
+
+Create the virtual environment:
+
+```bash
+python3 -m venv .venv
+```
+
+Activate it on macOS/Linux:
+
+```bash
 source .venv/bin/activate
+```
 
+Windows:
+
+```powershell
+.venv\Scripts\activate
+```
+
+Install dependencies:
+
+```bash
 pip install -r requirements.txt
+```
 
-# 3. Install frontend dependencies (separate terminal)
-cd src/frontend
+If required by the local Python environment:
+
+```bash
+pip install greenlet
+```
+
+## 5. Backend Database and ML Assets
+
+The backend uses the existing SQLite database:
+
+```text
+src/backend/port_congestion.db
+```
+
+The tracking/ML dataset is:
+
+```text
+src/backend/tracking_db.csv
+```
+
+Production model artifacts are stored in:
+
+```text
+src/backend/l1_congestion_production/
+```
+
+Expected artifacts:
+
+```text
+xgboost_pipeline.joblib
+lightgbm_pipeline.joblib
+metadata.joblib
+```
+
+Keep these files together. The application should use the production prediction pipeline rather than replacing predictions with mock values.
+
+## 6. Initialize Port Infrastructure
+
+Port, berth, and crane infrastructure can be initialized with:
+
+```bash
+cd src/backend
+source .venv/bin/activate
+python seed_port_infrastructure.py
+```
+
+Run the seed script only when the infrastructure needs to be initialized or regenerated.
+
+## 7. Start the Backend
+
+From `src/backend`:
+
+```bash
+source .venv/bin/activate
+python -m uvicorn app.main:app --reload
+```
+
+Backend:
+
+```text
+http://127.0.0.1:8000
+```
+
+FastAPI documentation:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+## 8. Frontend Setup
+
+Open a second terminal.
+
+From the repository root:
+
+```bash
+cd src
+```
+
+Install dependencies:
+
+```bash
 npm install
 ```
 
-## Running the Application
+Start Vite:
 
 ```bash
-# Start the backend (from src/backend, with venv activated)
-uvicorn app.main:app --reload --port 8000
-
-# Start the frontend (from src/frontend, in a separate terminal)
 npm run dev
 ```
 
-- Backend API: <http://localhost:8000>
-- Frontend:    <http://localhost:5173>
+Open the URL printed by Vite, normally:
 
-## Health Check
+```text
+http://localhost:5173
+```
 
-Verify the backend is running:
+## 9. Run the Full Application
+
+Two terminals are recommended.
+
+### Terminal 1 — FastAPI
 
 ```bash
-curl http://localhost:8000/api/health
+cd src/backend
+source .venv/bin/activate
+python -m uvicorn app.main:app --reload
 ```
 
-Expected response:
+### Terminal 2 — React/Vite
 
-```json
-{"status": "ok", "service": "port-congestion-backend"}
+```bash
+cd src
+npm run dev
 ```
 
-## Troubleshooting
+Then open the frontend URL shown by Vite.
 
-| Issue | Solution |
+## 10. Application Routes
+
+| Route | Function |
 |---|---|
-| `ModuleNotFoundError` | Run `pip install -r requirements.txt` again with the venv activated |
-| `CORS error` in browser | Ensure the backend is running on port 8000 and `CORS_ORIGINS` covers `http://localhost:5173` |
-| Vite port conflict | Change the port in `src/frontend/vite.config.js` |
-| SQLite locked | Ensure only one backend instance is running |
+| `/` | Home / command center |
+| `/vessels` | Vessel monitoring and congestion predictions |
+| `/ports` | Port overview |
+| `/analytics` | Analytics and operational insights |
+| `/operations` | Routes, berths, cranes, and 72-hour plan |
+| `/alerts` | Alerts |
+| `/reports` | Operational reports |
+| `/import` | CSV vessel data import |
+| `/settings` | Application settings |
+
+## 11. Data Import
+
+Demo CSV files are available at:
+
+```text
+src/frontend/public/portmind_demo_vessels.csv
+src/frontend/public/sample-vessels.csv
+```
+
+Use the **Data Import** page to upload vessel records.
+
+The current vessel import schema requires:
+
+```text
+imo_number
+vessel_name
+status
+```
+
+Supported status values are:
+
+```text
+active
+en_route
+berthed
+delayed
+inactive
+```
+
+The importer can validate the CSV, preview records, and send vessel records to the backend.
+
+### Important
+
+The ML prediction result should be generated by the backend. Do not treat manually supplied prediction labels as the production ML output.
+
+## 12. Congestion Prediction
+
+PortMind uses an XGBoost + LightGBM ensemble for vessel congestion prediction.
+
+The backend prediction flow uses the vessel/tracking features and returns values including:
+
+```text
+congestion_risk_score
+congestion_risk_flag
+congestion_risk_label
+threshold
+model_metrics
+features_used
+```
+
+The frontend displays the prediction on vessel-related screens.
+
+The prediction endpoint is exposed by the backend prediction API and can also be inspected through:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+## 13. Port Operations
+
+The Operations page provides:
+
+- Route recommendations
+- Berth assignments
+- Crane assignments
+- 72-hour operational planning
+
+Relevant API paths:
+
+```text
+/api/operations/routes
+/api/operations/berths
+/api/operations/cranes
+/api/operations/plan
+```
+
+Operational recommendations use vessel information and congestion-risk results.
+
+## 14. Frontend API Integration
+
+Frontend API integration is centralized in:
+
+```text
+src/frontend/src/services/api.js
+```
+
+The application includes API services for areas such as:
+
+- Vessels
+- Ports
+- Predictions
+- Operations
+- Alerts
+- Chat
+- History
+- Import history
+- Notifications
+- Profile
+- Reports
+- Rescheduling
+
+## 15. Static Assets
+
+Dashboard assets are under:
+
+```text
+src/frontend/public/assets/
+```
+
+The repository includes:
+
+```text
+a_wide_dark_navy_teal_themed_dashboard_background.png
+```
+
+Demo CSV files are under:
+
+```text
+src/frontend/public/
+```
+
+## 16. Build the Frontend
+
+From `src`:
+
+```bash
+npm run build
+```
+
+Preview the production build:
+
+```bash
+npm run preview
+```
+
+## 17. Backend Integration Test
+
+From `src/backend`:
+
+```bash
+source .venv/bin/activate
+python test_production_integration.py
+```
+
+## 18. Recommended End-to-End Test
+
+Use this sequence:
+
+```text
+Start FastAPI
+    ↓
+Start Vite
+    ↓
+Open Home
+    ↓
+Open Vessels
+    ↓
+Import vessel CSV
+    ↓
+Verify imported vessels
+    ↓
+Run congestion prediction
+    ↓
+Open Operations
+    ↓
+Verify route recommendations
+    ↓
+Verify berth assignments
+    ↓
+Verify crane assignments
+    ↓
+Verify 72-hour operational plan
+    ↓
+Check Ports
+    ↓
+Check Analytics
+    ↓
+Check Alerts
+    ↓
+Check Reports
+```
+
+## 19. Troubleshooting
+
+### `libomp.dylib` error
+
+On macOS:
+
+```bash
+brew install libomp
+```
+
+Restart the backend after installation.
+
+### `greenlet` error
+
+Activate the backend virtual environment and install:
+
+```bash
+pip install greenlet
+```
+
+### Frontend dependency error
+
+```bash
+cd src
+npm install
+```
+
+Then:
+
+```bash
+npm run dev
+```
+
+### Backend connection error
+
+Verify that FastAPI is running:
+
+```text
+http://127.0.0.1:8000
+```
+
+Then verify the API documentation:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+### CSV validation error
+
+Check:
+
+1. Required columns exist.
+2. `imo_number` values are valid and unique where required.
+3. `vessel_name` is present.
+4. `status` uses one of the supported values.
+5. The CSV contains valid rows.
+
+## 20. Git Workflow
+
+Check the current branch:
+
+```bash
+git branch --show-current
+```
+
+The application is published from:
+
+```text
+main
+```
+
+Check changes:
+
+```bash
+git status
+```
+
+Stage changes:
+
+```bash
+git add .
+```
+
+Commit:
+
+```bash
+git commit -m "Update PortMind application"
+```
+
+Push:
+
+```bash
+git push origin main
+```
+
+Before pushing, always verify the intended files with:
+
+```bash
+git status
+```
+
+## 21. Important Project Rules
+
+- Keep the production ML artifacts available to the backend.
+- Keep the SQLite database when the existing operational/demo state is required.
+- Do not replace production ML predictions with random or mock predictions.
+- Preserve the existing frontend assets used by the dashboard.
+- Do not remove required API services or application routes.
+- Run `npm run build` after significant frontend changes.
+- Run the backend integration test after significant backend/ML changes.
+- Keep `submission.yaml` and the hackathon documentation in the repository.
+- Use the `main` branch for the final repository version.
+
+## 22. Quick Start
+
+### Terminal 1
+
+```bash
+cd src/backend
+source .venv/bin/activate
+python -m uvicorn app.main:app --reload
+```
+
+### Terminal 2
+
+```bash
+cd src
+npm install
+npm run dev
+```
+
+Open the Vite URL shown in Terminal 2.
+
+## 23. Repository
+
+GitHub repository:
+
+```text
+https://github.com/AnmolDholiya/bob-ai-hackathon-the-titans.git
+```
+
+The `main` branch contains the final project version.
