@@ -1,0 +1,191 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DESIGN TOKENS — PortMind
+   ───────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Cyan palette */
+  --cyan:              #06d6c7;
+  --cyan-soft:         rgba(6, 214, 199, 0.15);
+  --cyan-glow:         rgba(6, 214, 199, 0.35);
+
+  /* Glass surfaces */
+  --glass:             rgba(255, 255, 255, 0.07);
+  --glass-border:      rgba(255, 255, 255, 0.12);
+  --dark-glass:        rgba(8, 30, 55, 0.20);
+  --dark-glass-border: rgba(6, 214, 199, 0.15);
+
+  /* Text */
+  --white:             #ffffff;
+  --muted-white:       rgba(255, 255, 255, 0.55);
+
+  /* Base */
+  --navy:              #020d1e;
+  --navy-mid:          #041428;
+
+  /* Radii */
+  --radius:            1rem;
+  --radius-sm:         0.5rem;
+  --radius-lg:         1.5rem;
+
+  /* Transitions */
+  --transition:        all 0.2s ease;
+}
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  ::-webkit-scrollbar           { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track     { background: transparent; }
+  ::-webkit-scrollbar-thumb     { background: rgba(6,214,199,0.3); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(6,214,199,0.5); }
+}
+
+@layer components {
+  /* ── Glass panels ────────────────────────────────────────────────────── */
+  .glass {
+    background: var(--glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+  }
+  .glass-dark {
+    background: var(--dark-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--dark-glass-border);
+    border-radius: var(--radius);
+  }
+
+  /* ── Buttons ─────────────────────────────────────────────────────────── */
+  .btn-cyan {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all;
+    background: linear-gradient(135deg, #06d6c7 0%, #0891b2 100%);
+    color: var(--navy);
+    box-shadow: 0 0 20px var(--cyan-glow);
+  }
+  .btn-cyan:hover {
+    box-shadow: 0 0 30px rgba(6,214,199,0.55);
+    transform: translateY(-1px);
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm text-white/80 transition-all;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.1); color: white; }
+
+  /* ── Nav items ───────────────────────────────────────────────────────── */
+  .nav-item {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 transition-all cursor-pointer select-none;
+  }
+  .nav-item:hover { @apply text-white; background: rgba(255,255,255,0.07); }
+  .nav-item.active {
+    @apply text-white font-semibold;
+    background: var(--cyan-soft);
+    border-left: 3px solid var(--cyan);
+    color: var(--cyan);
+  }
+
+  /* ── Progress bar ────────────────────────────────────────────────────── */
+  .progress-bar {
+    @apply h-1.5 rounded-full overflow-hidden;
+    background: rgba(255,255,255,0.1);
+  }
+  .progress-bar-fill {
+    @apply h-full rounded-full transition-all duration-500;
+    background: linear-gradient(90deg, var(--cyan), #0891b2);
+  }
+
+  /* ── Header controls ─────────────────────────────────────────────────── */
+  .hdr-ctrl {
+    display:        inline-flex;
+    align-items:    center;
+    height:         38px;
+    padding-inline: 12px;
+    border-radius:  10px;
+    border:         1px solid rgba(255,255,255,0.13);
+    background:     rgba(255,255,255,0.07);
+    cursor:         pointer;
+    transition:     background 0.18s, border-color 0.18s;
+    white-space:    nowrap;
+    font-family:    inherit;
+  }
+  .hdr-ctrl:hover {
+    background:   rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.22);
+  }
+
+  /* ── Placeholder for search input ───────────────────────────────────── */
+  input::placeholder { color: rgba(255,255,255,0.35); }
+}
+
+/* ── Sidebar mobile hide (outside @layer to avoid PostCSS quirks) ─────────── */
+@media (max-width: 1023px) {
+  .sidebar-default {
+    transform: translateX(-160px);
+  }
+}
+
+/* ── Keyframes ────────────────────────────────────────────────────────────── */
+@keyframes hero-enter {
+  from {
+    opacity:   0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity:   1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes kpi-enter {
+  from {
+    opacity:   0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity:   1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes bar-grow {
+  from { width: 0%; }
+  to   { width: var(--bar-w, 100%); }
+}
+
+@keyframes route-pulse {
+  0%, 100% { opacity: 0.6; transform: scaleX(1);    }
+  50%       { opacity: 1;   transform: scaleX(1.02); }
+}
+
+@keyframes vessel-travel {
+  from { transform: translateX(-6px); opacity: 0.5; }
+  to   { transform: translateX(0);    opacity: 1;   }
+}

@@ -6,74 +6,100 @@
 
 Before you begin, ensure you have the following installed:
 
-- [ ] [e.g., Python 3.11+]
-- [ ] [e.g., Node.js 18+]
-- [ ] [e.g., Docker Desktop]
-- [ ] [e.g., An IBM Cloud account with watsonx.ai access]
+- [ ] Python 3.11+
+- [ ] Node.js 18+
+- [ ] npm 9+
+
+## Repository Structure
+
+```
+src/
+├── frontend/     ← React + Vite UI
+├── backend/      ← FastAPI server
+└── ml/           ← ML layer (placeholder — future phase)
+```
 
 ## Environment Variables
 
-Copy `.env.example` to `.env` and fill in the values:
+### Backend
 
 ```bash
+cd src/backend
 cp .env.example .env
 ```
 
 | Variable | Description | Required |
 |---|---|---|
-| `WATSONX_API_KEY` | Your IBM watsonx.ai API key | Yes |
-| `WATSONX_PROJECT_ID` | Your watsonx.ai project ID | Yes |
-| `DATABASE_URL` | PostgreSQL connection string | Yes |
-| `SLACK_WEBHOOK_URL` | Slack webhook for alerts | No |
+| `APP_ENV` | Application environment (`development` / `production`) | No |
+| `APP_PORT` | Port the backend listens on (default `8000`) | No |
+| `DATABASE_URL` | SQLite connection URL | No |
+| `CORS_ORIGINS` | Comma-separated list of allowed frontend origins | No |
+
+### Frontend
+
+```bash
+cd src/frontend
+cp .env.example .env
+```
+
+| Variable | Description | Required |
+|---|---|---|
+| `VITE_API_BASE_URL` | Backend base URL (default `http://localhost:8000`) | No |
 
 ## Installation
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/[your-org]/[your-repo].git
-cd [your-repo]
+git clone https://github.com/<your-org>/bob-ai-hackathon-the-titans.git
+cd bob-ai-hackathon-the-titans
 
 # 2. Install backend dependencies
-[your command — e.g.: pip install -r requirements.txt]
+cd src/backend
+python -m venv .venv
+# Windows
+.venv\Scripts\activate
+# macOS / Linux
+source .venv/bin/activate
 
-# 3. Install frontend dependencies (if applicable)
-[your command — e.g.: cd frontend && npm install]
+pip install -r requirements.txt
 
-# 4. Set up the database (if applicable)
-[your command — e.g.: python manage.py migrate]
+# 3. Install frontend dependencies (separate terminal)
+cd src/frontend
+npm install
 ```
 
 ## Running the Application
 
 ```bash
-# Start the backend
-[your command — e.g.: uvicorn app.main:app --reload]
+# Start the backend (from src/backend, with venv activated)
+uvicorn app.main:app --reload --port 8000
 
-# Start the frontend (in a separate terminal, if applicable)
-[your command — e.g.: cd frontend && npm run dev]
+# Start the frontend (from src/frontend, in a separate terminal)
+npm run dev
 ```
 
-The application will be available at: `http://localhost:[PORT]`
+- Backend API: <http://localhost:8000>
+- Frontend:    <http://localhost:5173>
 
-## Running Tests
+## Health Check
+
+Verify the backend is running:
 
 ```bash
-[your test command — e.g.: pytest tests/ -v]
+curl http://localhost:8000/api/health
 ```
 
-## Quick Demo (Optional)
+Expected response:
 
-If you have a demo script or sample data to showcase the project quickly:
-
-```bash
-[e.g.: python demo/seed_demo_data.py]
-[e.g.: open http://localhost:8000/demo]
+```json
+{"status": "ok", "service": "port-congestion-backend"}
 ```
 
 ## Troubleshooting
 
 | Issue | Solution |
 |---|---|
-| [e.g., `ModuleNotFoundError`] | [e.g., Run `pip install -r requirements.txt` again] |
-| [e.g., Database connection refused] | [e.g., Ensure PostgreSQL is running: `docker compose up db`] |
-| [e.g., watsonx.ai 401 error] | [e.g., Check `WATSONX_API_KEY` in your `.env` file] |
+| `ModuleNotFoundError` | Run `pip install -r requirements.txt` again with the venv activated |
+| `CORS error` in browser | Ensure the backend is running on port 8000 and `CORS_ORIGINS` covers `http://localhost:5173` |
+| Vite port conflict | Change the port in `src/frontend/vite.config.js` |
+| SQLite locked | Ensure only one backend instance is running |

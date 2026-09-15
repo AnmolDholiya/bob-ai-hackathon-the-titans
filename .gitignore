@@ -86,6 +86,13 @@ demo/*.mkv
 data/
 logs/
 *.log
+*.db
+*.sqlite
+*.sqlite3
+*.csv
+*_err.txt
+*_out.txt
+src/package-lock.json
 
 # ── Jupyter Notebooks (optional: remove if you want to commit notebooks) ──────
 # .ipynb_checkpoints/
