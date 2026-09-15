@@ -62,14 +62,21 @@ function riskGuidance(label) {
   return GUIDANCE[label] ?? 'Monitor berth availability and vessel progress.'
 }
 
-// ── Derive fleet risk summary from existing predMap state ─────────────────────
+// ── Derive fleet risk summary from existing predMap state & vessel risk data ────
 function fleetSummary(vessels, predMap) {
   const total    = vessels.length
-  const analyzed = Object.values(predMap).filter(p => p.result).length
-  const high     = Object.values(predMap).filter(p => p.result?.congestion_risk_flag === 1).length
-  const normal   = Object.values(predMap).filter(p => p.result?.congestion_risk_flag === 0).length
+  let analyzed = Object.values(predMap).filter(p => p.result).length
+  let high     = Object.values(predMap).filter(p => p.result?.congestion_risk_flag === 1).length
+  let normal   = Object.values(predMap).filter(p => p.result?.congestion_risk_flag === 0).length
+
+  if (analyzed === 0 && vessels.length > 0) {
+    analyzed = vessels.length
+    high = vessels.filter(v => (v.congestion_risk || '').toLowerCase() === 'high' || (v.congestion_risk || '').toLowerCase() === 'medium').length
+    normal = total - high
+  }
   return { total, analyzed, high, normal }
 }
+
 
 // ── Top-N vessels by real congestion_risk_score ───────────────────────────────
 function priorityVessels(vessels, predMap, n = 3) {

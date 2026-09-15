@@ -38,11 +38,43 @@ const ICON_MAP = {
 
 export function KPICard({ label, value, icon }) {
   return (
+<<<<<<< HEAD
     <div className="glass flex items-center gap-4 px-5 py-4 animate-fade-in hover:scale-[1.02] transition-transform">
       <div className="text-cyan-400 opacity-80">{ICON_MAP[icon] ?? ICON_MAP.anchor}</div>
       <div>
         <p className="text-2xl font-bold text-white leading-none">{value}</p>
         <p className="text-xs text-white/50 mt-1">{label}</p>
+=======
+    <div
+      className="glass"
+      style={{
+        display: 'flex', alignItems: 'center', gap: 14,
+        padding: '14px 18px',
+        transition: 'transform 0.18s ease, box-shadow 0.18s ease',
+      }}
+      onMouseEnter={e => {
+        e.currentTarget.style.transform = 'translateY(-2px)'
+        e.currentTarget.style.boxShadow = '0 8px 28px rgba(6,214,199,0.12)'
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.transform = ''
+        e.currentTarget.style.boxShadow = ''
+      }}
+    >
+      {/* Teal icon box */}
+      <div style={{
+        width: 42, height: 42, borderRadius: 10, flexShrink: 0,
+        background: 'rgba(6,214,199,0.13)',
+        border: '1px solid rgba(6,214,199,0.25)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: '#06d6c7',
+      }}>
+        {ICON_MAP[icon] ?? ICON_MAP.anchor}
+      </div>
+      <div>
+        <p style={{ fontSize: 26, fontWeight: 800, color: '#fff', lineHeight: 1, margin: 0 }}>{value}</p>
+        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.48)', marginTop: 4, letterSpacing: '0.02em' }}>{label}</p>
+>>>>>>> 3b90e15 (feat: complete PortMind production integration — AI 72h operational schedule, XGBoost+LightGBM ensemble, CSV ingestion, i18n & command center)
       </div>
     </div>
   )
@@ -111,9 +143,26 @@ export function ProgressBar({ value, max = 100, showLabel = false, colorClass })
 // ── Section Header ────────────────────────────────────────────────────────────
 export function SectionHeader({ title, action }) {
   return (
+<<<<<<< HEAD
     <div className="flex items-center justify-between mb-4">
       <h2 className="text-lg font-semibold text-white">{title}</h2>
       {action && <button className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors font-medium">{action} →</button>}
+=======
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+      <h2 style={{ fontSize: 14, fontWeight: 700, color: '#fff', margin: 0, letterSpacing: '0.01em' }}>{title}</h2>
+      {action && (
+        <button style={{
+          fontSize: 11, color: '#06d6c7', background: 'none', border: 'none',
+          cursor: 'pointer', fontFamily: 'inherit', fontWeight: 500,
+          transition: 'color 0.15s',
+        }}
+          onMouseEnter={e => e.currentTarget.style.color = '#34d9d0'}
+          onMouseLeave={e => e.currentTarget.style.color = '#06d6c7'}
+        >
+          {action} →
+        </button>
+      )}
+>>>>>>> 3b90e15 (feat: complete PortMind production integration — AI 72h operational schedule, XGBoost+LightGBM ensemble, CSV ingestion, i18n & command center)
     </div>
   )
 }

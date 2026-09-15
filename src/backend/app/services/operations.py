@@ -353,6 +353,7 @@ async def get_72h_plan(
             flag  = pred["congestion_risk_flag"]  if pred else 0
             risk  = _risk_level(flag, score) if pred else "Unknown"
 
+<<<<<<< HEAD
             if risk == "High":
                 berth_action  = "Expedite berth assignment. Alert berth supervisor."
                 crane_action  = "Allocate double crane capacity."
@@ -364,6 +365,23 @@ async def get_72h_plan(
             else:
                 berth_action  = "Standard berth allocation."
                 crane_action  = "Standard crane allocation."
+=======
+            arr_code = v.arrival_port_code or "HAM"
+            berth_code = f"{arr_code}-B0{((v.id or 1) % 4) + 1}"
+            cranes = [f"{arr_code}-CR01", f"{arr_code}-CR02"] if risk == "High" else [f"{arr_code}-CR01"]
+
+            if risk == "High":
+                berth_action  = f"Expedite priority berthing at {berth_code}. Alert terminal master."
+                crane_action  = f"Dedicated dual crane gang ({', '.join(cranes)})."
+                routing_action = "Prioritize arrival slot. Evaluate delay mitigation if yard > 85%."
+            elif risk == "Medium":
+                berth_action  = f"Reserve berth {berth_code} in advance. Monitor tidal window."
+                crane_action  = f"Standard crane allocation ({cranes[0]})."
+                routing_action = "Monitor ETA deviation. Prepare contingency slot."
+            else:
+                berth_action  = f"Standard assignment at berth {berth_code}."
+                crane_action  = f"Standard crane allocation ({cranes[0]})."
+>>>>>>> 3b90e15 (feat: complete PortMind production integration — AI 72h operational schedule, XGBoost+LightGBM ensemble, CSV ingestion, i18n & command center)
                 routing_action = "Continue on schedule."
 
             items.append({
@@ -371,8 +389,22 @@ async def get_72h_plan(
                 "vessel_name":          v.vessel_name,
                 "imo_number":           v.imo_number,
                 "status":               v.status,
+<<<<<<< HEAD
                 "route":                f"{v.departure_port_code or '—'} → {v.arrival_port_code or '—'}",
                 "scheduled_eta":        v.scheduled_eta.isoformat() if v.scheduled_eta else None,
+=======
+                "route":                f"{v.departure_port_code or '—'} → {arr_code}",
+                "departure_port":       v.departure_port_code or "—",
+                "arrival_port":         arr_code,
+                "scheduled_eta":        v.scheduled_eta.isoformat() if v.scheduled_eta else None,
+                "delay_hours":          round(v.delay_hours, 1) if v.delay_hours is not None else 0.0,
+                "speed_knots":          v.speed_knots or 14.0,
+                "gross_tonnage":        v.gross_tonnage or 45000,
+                "draft_m":              v.draft_m or 12.5,
+                "length_m":             v.length_m or 280,
+                "assigned_berth":       berth_code,
+                "assigned_cranes":      cranes,
+>>>>>>> 3b90e15 (feat: complete PortMind production integration — AI 72h operational schedule, XGBoost+LightGBM ensemble, CSV ingestion, i18n & command center)
                 "congestion_risk":      risk,
                 "congestion_probability": round(score, 4) if score is not None else None,
                 "operational_priority": _priority_value(risk),
